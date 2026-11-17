@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>강서힐스테이트 브리핑 · GO부동산</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Noto+Sans+KR:wght@500;700;900&display=swap">
+<style>
+/* Layout: 단지 한 곳을 위한 브리핑 북 — 요약 → 시세·실거래 → 비교 → 매물 → 입지 → 대출·비용. GO 레드 + 차콜 */
+:root{
+  --red:#d7261e; --red-soft:#fbe9e7; --ink:#231f20; --bg:#f6f4f3; --panel:#ffffff; --line:#e4dfdd;
+  --muted:#6f6866; --fg:#231f20; --blue:#2f6db5; --green:#2f8a57; --amber:#b86f0c; --chip:#f0ecea;
+  --c-a:#2f6db5; --c-b:#d7261e; --c-c:#7a4fb5; --c-d:#2f8a57; --c-e:#b86f0c;
+  --font-body:"IBM Plex Sans KR","Noto Sans KR",system-ui,"Malgun Gothic",sans-serif;
+  --font-display:"Noto Sans KR","IBM Plex Sans KR",system-ui,"Malgun Gothic",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --red:#ff5a4f; --red-soft:#3a1d1b; --ink:#f3eeec; --bg:#171515; --panel:#211e1e; --line:#363130;
+  --muted:#a8a09d; --fg:#f3eeec; --blue:#6aa4e8; --green:#5cc489; --amber:#e5a548; --chip:#2c2827;
+  --c-a:#6aa4e8; --c-b:#ff5a4f; --c-c:#b18ae8; --c-d:#5cc489; --c-e:#e5a548; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --red:#ff5a4f; --red-soft:#3a1d1b; --ink:#f3eeec; --bg:#171515; --panel:#211e1e; --line:#363130;
+  --muted:#a8a09d; --fg:#f3eeec; --blue:#6aa4e8; --green:#5cc489; --amber:#e5a548; --chip:#2c2827;
+  --c-a:#6aa4e8; --c-b:#ff5a4f; --c-c:#b18ae8; --c-d:#5cc489; --c-e:#e5a548; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:14px;line-height:1.55;margin:0}
+.wrap{max-width:1200px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 40px}
+.num{font-variant-numeric:tabular-nums}
+h1,h2,h3,h4{font-family:var(--font-display);text-wrap:balance;margin:0}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+a{color:var(--blue)}
+
+.top{background:var(--panel);border-bottom:3px solid var(--red)}
+.top .wrap{display:flex;align-items:center;gap:16px;padding-block:12px;flex-wrap:wrap}
+.logo{background:#fff;border-radius:10px;padding:5px 9px;border:1px solid var(--line);display:flex}
+.logo img{height:50px;width:auto;display:block}
+.brand{flex:1 1 260px;min-width:0;display:flex;flex-direction:column;gap:1px}
+.eyebrow{font-size:12px;letter-spacing:.06em;color:var(--red);font-weight:700}
+.brand b{font-family:var(--font-display);font-size:18px;font-weight:900}
+.brand span{font-size:12.5px;color:var(--muted)}
+.contact{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.tel{font-family:var(--font-display);font-weight:900;font-size:22px;color:var(--red);user-select:all}
+.copy{border:1px solid var(--line);background:var(--chip);border-radius:999px;padding:2px 10px;font-size:12px;cursor:pointer}
+
+.hero{padding-block:22px 6px;display:flex;flex-direction:column;gap:8px}
+.hero h1{font-size:clamp(28px,4.4vw,44px);font-weight:900;letter-spacing:-.02em}
+.hero h1 small{font-size:.42em;color:var(--muted);font-weight:700;margin-left:8px;letter-spacing:0}
+.facts{display:flex;flex-wrap:wrap;gap:6px}
+.facts span{background:var(--chip);border-radius:999px;padding:3px 10px;font-size:12.5px;color:var(--fg)}
+.asof{font-size:12px;color:var(--muted)}
+
+section{margin-top:26px}
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.sec-h h2{font-size:20px;font-weight:900}
+.sec-h h2 small{font-size:12px;color:var(--muted);font-weight:500;margin-left:6px}
+.src{font-size:11.5px;color:var(--muted)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px}
+.pad{padding:14px 16px}
+
+.kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+.kpi{padding:12px 14px;display:flex;flex-direction:column;gap:1px}
+.kpi .k{font-size:12px;color:var(--muted);font-weight:600}
+.kpi .v{font-family:var(--font-display);font-size:23px;font-weight:900;letter-spacing:-.02em}
+.kpi .d{font-size:12px;color:var(--muted)}
+.kpi.main{border-color:var(--red);background:var(--red-soft)}
+.up{color:var(--red)} .down{color:var(--blue)}
+
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{font-size:12px;color:var(--muted);font-weight:600}
+td.l,th.l{text-align:left}
+.sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:0}
+.barcell{display:flex;align-items:center;gap:8px;justify-content:flex-end}
+.minibar{height:8px;border-radius:4px;background:var(--red)}
+.minibar.j{background:var(--blue)}
+
+.tabs{display:inline-flex;gap:6px;flex-wrap:wrap}
+.tabs button{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:5px 14px;font-weight:700;cursor:pointer;font-size:13px}
+.tabs button[aria-selected="true"]{background:var(--ink);border-color:var(--ink);color:var(--panel)}
+.two{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:12px}
+.two.even{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+svg text{fill:var(--muted);font-size:11px;font-family:var(--font-body)}
+.grid line{stroke:var(--line)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:2px 0 6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--panel);font-size:12px;padding:6px 9px;border-radius:7px;z-index:50;max-width:260px;line-height:1.45}
+.pill{display:inline-block;font-size:11px;font-weight:700;padding:1px 8px;border-radius:999px;background:var(--chip);color:var(--muted)}
+.pill.t{background:var(--red);color:#fff}.pill.j{background:var(--blue);color:#fff}.pill.w{background:var(--amber);color:#fff}
+.pill.g{background:color-mix(in srgb,var(--green) 18%,transparent);color:var(--green)}
+.pill.u{background:color-mix(in srgb,var(--amber) 20%,transparent);color:var(--amber)}
+tr.off td{color:var(--muted);text-decoration:line-through}
+.note{font-size:12px;color:var(--muted);background:var(--chip);border-radius:8px;padding:8px 12px;margin-top:10px}
+
+.points{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pt{padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.pt h4{font-size:15px}
+.pt .big{font-family:var(--font-display);font-weight:900;font-size:20px;color:var(--red)}
+.pt p{margin:0;font-size:13px;color:var(--muted)}
+.pt.warn h4{color:var(--amber)}
+.pt.warn .big{color:var(--amber)}
+
+.hs-sum{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;margin-bottom:10px}
+.hs-tile{padding:10px 12px;border:1px solid var(--line);background:var(--panel);border-radius:10px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:2px}
+.hs-tile[aria-pressed="true"]{border-color:var(--red);box-shadow:0 0 0 2px var(--red-soft)}
+.hs-tile .py{font-family:var(--font-display);font-weight:900;font-size:17px}
+.hs-tile .cnt{font-size:12px;color:var(--muted)}
+.hs-tile .rg{font-size:12.5px;font-weight:600}
+td.t{white-space:normal;text-align:left;min-width:220px;max-width:380px}
+.warn-t{color:var(--amber);font-size:11.5px;font-weight:700;display:block}
+
+.loc{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.col h4{font-size:14px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.col h4::before{content:"";width:4px;height:14px;border-radius:2px;background:var(--red)}
+.col ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.col li{display:flex;justify-content:space-between;gap:8px;font-size:13px;border-bottom:1px dashed var(--line);padding-bottom:5px}
+.col li .r{color:var(--muted);white-space:nowrap;font-size:12px}
+.grade{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:5px;font-size:11px;font-weight:800;color:#fff;margin-right:6px}
+.grade.S{background:#7a4fb5}.grade.A{background:var(--green)}.grade.B{background:var(--blue)}.grade.C{background:#8a8380}
+.sub4{font-size:12px;color:var(--muted);margin:10px 0 4px;font-weight:700}
+.timeline{display:flex;gap:0;margin-top:10px;overflow-x:auto}
+.timeline div{flex:1 0 110px;border-top:3px solid var(--line);padding:6px 8px 0 0;font-size:12px;color:var(--muted);position:relative}
+.timeline div.done{border-color:var(--red);color:var(--fg)}
+.timeline div.now b{color:var(--red)}
+
+.calc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:12px}
+.form{display:grid;gap:10px}
+.form label{font-size:12px;color:var(--muted);font-weight:600;display:flex;flex-direction:column;gap:4px}
+.form input,.form select{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:7px 10px}
+.res{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.res div{background:var(--chip);border-radius:10px;padding:10px 12px}
+.res .k{font-size:12px;color:var(--muted)}
+.res .v{font-family:var(--font-display);font-weight:900;font-size:19px}
+.res .s{font-size:11.5px;color:var(--muted)}
+.foot{margin-top:26px;font-size:12px;color:var(--muted);display:grid;gap:6px}
+
+@media (max-width:1000px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.loc{grid-template-columns:repeat(2,minmax(0,1fr))}.hs-sum{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:760px){.two,.two.even,.calc,.points{grid-template-columns:minmax(0,1fr)}.contact{align-items:flex-start}}
+@media (max-width:480px){.kpis,.hs-sum{grid-template-columns:repeat(2,minmax(0,1fr))}.loc,.res{grid-template-columns:minmax(0,1fr)}.logo img{height:40px}}
+</style>
+</head>
+<body>
+
+
+<header class="top"><div class="wrap">
+  <div class="logo"><img alt="GO부동산 로고" src="data:image/png;base64,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"></div>
+  <div class="brand"><span class="eyebrow">강서힐스테이트 단지 내 공인중개사사무소</span><b>GO부동산</b><span>강서구 강서로 242 강서힐스테이트 상가동 1층 132호 · gogogogo.kr</span></div>
+  <div class="contact"><span class="tel num" id="tel">010-2733-5040</span><button class="copy" id="copyTel" type="button">전화번호 복사</button></div>
+</div></header>
+
+<main class="wrap">
+  <div class="hero">
+    <h1>강서힐스테이트 <small>서울 강서구 화곡동 1165</small></h1>
+    <div class="facts"><span>2,603세대 · 37개 동</span><span>2015년 8월 입주</span><span>8~21층</span><span>현대건설</span><span>용적률 259% · 건폐율 22%</span><span>주차 세대당 1.69대 · 지상 차 없는 단지</span><span>지역난방</span><span>24·33·45·48·55평형</span></div>
+    <div class="asof">시세·예측: 리치고(2026.11.16) · 실거래: 국토교통부(2024.11~2026.11.17 조회) · 매물: GO부동산 홈페이지(2026.11.17 조회)</div>
+  </div>
+
+  <section style="margin-top:12px">
+    <div class="kpis">
+      <div class="card kpi main"><span class="k">33평 시세 (리치고)</span><span class="v num">15억 8,662</span><span class="d">최고점 15.94억 대비 −0.4%</span></div>
+      <div class="card kpi"><span class="k">33평 최근 실거래</span><span class="v num">16억 4,300</span><span class="d">2026.10.30 · 18층</span></div>
+      <div class="card kpi"><span class="k">33평 매물 최저가</span><span class="v num">15억 7,000</span><span class="d">저층 · 리치고 집계</span></div>
+      <div class="card kpi"><span class="k">1년 상승률 (33평)</span><span class="v num up">+11.3%</span><span class="d">3년 +28.9% · 10년 +126.5%</span></div>
+      <div class="card kpi"><span class="k">전세가율 (33평)</span><span class="v num">53.5%</span><span class="d">전세 시세 8억 4,961</span></div>
+      <div class="card kpi"><span class="k">3개월 뒤 예측 (모델)</span><span class="v num">16억 782</span><span class="d">+1.3% · 추측입니다(통계모델)</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-h"><h2>평형별 시세 한눈에 <small>리치고 시세 + 국토부 실거래 + GO 보유 매물</small></h2><span class="src">시세는 실거래·매물로 추정한 값이며 실거래가가 아닙니다</span></div>
+    <div class="card"><div class="tbl"><table id="pyTbl"></table></div></div>
+  </section>
+
+  <section class="two">
+    <div class="card pad">
+      <div class="sec-h" style="margin-bottom:4px"><h2 style="font-size:17px">실거래 추이 <small>점 = 거래 1건, 선 = 월 중앙값</small></h2><div class="tabs" id="tTabs" role="tablist"></div></div>
+      <div id="tChart"></div>
+      <div class="src">국토교통부 실거래 신고 기준. 해제 거래 제외, 직거래는 속이 빈 점. 최근 30일은 신고 기한이 남아 거래가 더 늘 수 있음.</div>
+    </div>
+    <div class="card pad">
+      <h2 style="font-size:17px;margin-bottom:6px">최근 거래 <small id="recentLbl" class="src"></small></h2>
+      <div class="tbl"><table id="recentTbl"></table></div>
+    </div>
+  </section>
+
+  <section class="two even">
+    <div class="card pad">
+      <h2 style="font-size:17px">전세 시세 흐름 <small class="src" id="jLbl"></small></h2>
+      <div class="legend"><span><i style="background:var(--blue)"></i>전세 월평균 보증금</span><span><i style="background:var(--red)"></i>매매 월 중앙값</span><span><i style="background:var(--amber)"></i>전세가율(오른쪽 축)</span></div>
+      <div id="jChart"></div>
+      <div class="src">전세 = 월세 없는 임대차 신고 평균. 갱신계약 포함.</div>
+    </div>
+    <div class="card pad">
+      <h2 style="font-size:17px">라이벌 비교 <small class="src">전용 84㎡ 실거래 반기 중간값</small></h2>
+      <div class="legend"><span><i style="background:var(--red)"></i>강서힐스테이트</span><span><i style="background:var(--ink)"></i>우장산아이파크e편한세상</span></div>
+      <div id="rvChart"></div>
+      <div class="src">리치고 집계(2026.11). 2017년 이후 반기 맞대결 강서힐스테이트 16승 4패, 1위 3번 바뀜. 26년 하반기는 2.3% 낮아 격차를 좁히는 중.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-h"><h2>고객 설명 포인트</h2><span class="src">근거 자료 기준 · 전망 표현은 추측입니다</span></div>
+    <div class="points">
+      <div class="card pt"><h4>강서구 대표 대단지</h4><span class="big num">2,603세대 · 지상 무차량</span><p>37개 동이 지상에 차 없이 배치된 단지. 33평은 2025년 60건, 48평은 2026년 27건 거래되어 큰 평형까지 사고팔기가 잘 되는 편입니다(리치고).</p></div>
+      <div class="card pt"><h4>학군·학원가 도보권</h4><span class="big num">반경 1km 학원 345곳</span><p>명덕고(서울 상위 24%, 서울대 11명)·명덕여중 0.8km, 단지 상가와 우장산 학원가 이용. 5호선으로 목동 학원가 접근(리치고·교육청 공개자료).</p></div>
+      <div class="card pt"><h4>화곡동 시세 3위</h4><span class="big num">평당 4,807만원</span><p>화곡동 92개 단지 중 3위. 1위 우장산숲아이파크(5,798만), 2위 우장산아이파크e편한세상(5,051만)과 비교해 설명하기 좋습니다.</p></div>
+      <div class="card pt"><h4>교통 호재</h4><span class="big num">화곡역 593m</span><p>대장홍대선이 화곡역을 지날 계획. 개통 시점과 역 위치는 확실하지 않음, 사업 진행은 공식 발표로 확인 필요.</p></div>
+      <div class="card pt warn"><h4>단기 조정 신호</h4><span class="big num">고점 대비 −4.9%</span><p>33평 4층이 2026.10.30 15.5억에 거래되어 5월 최고가 16.3억보다 낮았습니다. 거래 1건이라 시세 전체 하락으로 단정할 수 없습니다.</p></div>
+      <div class="card pt warn"><h4>대출 한도 체크</h4><span class="big num">15억 초과 → 주담대 최대 4억</span><p>33평 이상은 시세가 15억을 넘어 대출 한도가 줄어듭니다. 서울 전역 토지거래허가구역이라 실거주 목적 매수가 기본입니다. 아래 표 참고.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-h"><h2>GO부동산 보유 매물 <small>평형을 누르면 목록이 바뀝니다</small></h2><span class="src">gogogogo.kr 등록 호가 · 2026.11.17 조회</span></div>
+    <div class="hs-sum" id="hsSum"></div>
+    <div class="card"><div class="tbl"><table id="hsTbl"></table></div></div>
+    <div class="note">가격은 등록 호가이며 실거래가가 아닙니다. 평형은 제목이 아닌 전용면적 기준으로 분류했습니다. ⚠ 표시는 제목·등록가 불일치 또는 같은 평형 호가보다 많이 낮은 매물로, 거래 가능 여부를 다시 확인할 대상입니다.</div>
+  </section>
+
+  <section>
+    <div class="sec-h"><h2>입지 분석</h2><span class="src">거리는 직선거리 · 리치고 및 OpenStreetMap 기준</span></div>
+    <div class="card pad">
+      <div class="loc">
+        <div class="col"><h4>교통</h4><ul>
+          <li><span>우장산역 <span class="src">5호선</span></span><span class="r">331m</span></li>
+          <li><span>화곡역 <span class="src">5호선 · 대장홍대선 예정</span></span><span class="r">593m</span></li>
+          <li><span>발산역 <span class="src">5호선</span></span><span class="r">약 1.2km</span></li>
+          <li><span>마곡나루역 <span class="src">9호선 급행·공항철도</span></span><span class="r">약 2.7km</span></li>
+          <li><span>김포국제공항</span><span class="r">약 3.6km</span></li>
+          <li><span>KTX 광명역</span><span class="r">약 15km</span></li></ul>
+          <div class="sub4">버스</div><ul><li><span>강서힐스테이트아파트 정류장</span><span class="r">215m</span></li><li><span>공항대로 중앙버스차로</span><span class="r">간선·광역</span></li></ul>
+        </div>
+        <div class="col"><h4>학군</h4><ul id="schools"></ul>
+          <div class="sub4">주변 학원 브랜드</div><ul><li><span>필즈수학 <span class="src">사고력수학</span></span><span class="r">386m</span></li><li><span>플레이팩토 <span class="src">사고력수학</span></span><span class="r">442m</span></li><li><span>시대인재 ES관 <span class="src">입시·재수</span></span><span class="r">487m</span></li></ul>
+          <div class="src" style="margin-top:6px">배정 학교는 학구도안내서비스에서 주소로 확인하세요. 우장초 통학은 단지 자체 셔틀버스 운행.</div>
+        </div>
+        <div class="col"><h4>생활편의</h4><ul>
+          <li><span>베스트식자재마트 우장산점</span><span class="r">227m</span></li>
+          <li><span>한살림 우장산매장</span><span class="r">229m</span></li>
+          <li><span>롯데슈퍼프레시 우장산점</span><span class="r">404m</span></li>
+          <li><span>NC백화점 강서점</span><span class="r">약 1.4km</span></li>
+          <li><span>이대서울병원</span><span class="r">약 1.0km</span></li>
+          <li><span>강서구청</span><span class="r">약 1.2km</span></li>
+          <li><span>우장산공원(녹지)</span><span class="r">181m</span></li></ul>
+          <div class="src" style="margin-top:6px">리치고 거주환경 95점 · 생활 94점 · 교육 95점 · 교통 74점</div>
+        </div>
+        <div class="col"><h4>주변 호재</h4><ul>
+          <li><span><span class="grade S">S</span>대장홍대선 화곡역</span><span class="r">592m</span></li>
+          <li><span><span class="grade A">A</span>모아타운 화곡동 1087</span><span class="r">774m</span></li>
+          <li><span><span class="grade A">A</span>마곡 도시개발</span><span class="r">917m</span></li>
+          <li><span><span class="grade B">B</span>청년주택</span><span class="r">271m</span></li>
+          <li><span><span class="grade B">B</span>화곡동 140-35 오피스텔</span><span class="r">590m</span></li></ul>
+          <div class="src" style="margin-top:6px">등급은 리치고 호재점수(S가 가장 높음). 사업 일정은 확실하지 않음.</div>
+        </div>
+      </div>
+      <div class="sub4" style="margin-top:14px">집값에 영향을 줄 이벤트 (리치고 정리)</div>
+      <div class="timeline"><div class="done">입주<br>2015.08</div><div class="done now"><b>조식 서비스 개시</b><br>2026.02 · 현재</div><div>대장홍대선 개통<br><span class="src">일정 확실하지 않음</span></div><div>모아타운 정비</div><div>마곡 도시개발 완성</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-h"><h2>대출 한도 · 매수 비용</h2><span class="src">2025.10.15 대책 기준 · 이후 변경 여부는 은행·법무사에 확인</span></div>
+    <div class="card"><div class="tbl"><table id="loanTbl"></table></div></div>
+    <div class="note">서울 전역 조정대상지역·투기과열지구·토지거래허가구역(2025.10.20~). 규제지역 주담대 LTV 40%, 주택가격별 한도 15억 이하 6억 · 15~25억 4억 · 25억 초과 2억. 토지거래허가로 매수 후 2년 실거주가 필요해 전세 낀 매수(갭투자)는 어렵습니다. DSR·소득에 따라 실제 한도는 더 낮을 수 있습니다.</div>
+    <div class="card pad calc" style="margin-top:12px">
+      <form class="form" id="calcForm">
+        <h3 style="font-size:16px">매수 비용 계산기</h3>
+        <label for="cPrice">매매가 (만원)<input id="cPrice" type="number" step="500" min="10000" value="158662" inputmode="numeric"></label>
+        <label for="cArea">전용면적<select id="cArea"><option value="s">85㎡ 이하 (24·33평형)</option><option value="l">85㎡ 초과 (45·48·55평형)</option></select></label>
+        <label for="cHouse">매수 후 주택 수<select id="cHouse"><option value="1">1주택(무주택자 매수)</option><option value="2">2주택(일시적 2주택 아님)</option><option value="3">3주택 이상</option></select></label>
+      </form>
+      <div class="res" id="calcRes"></div>
+    </div>
+    <div class="note">보유세(33평 평균 공시가격 8억 9,815만원, 1주택): 2026년 약 141.8만원. 2027년 약 189만원은 공시가 10% 상승·정부안 가정의 추정이라 추측입니다(리치고, 이장원 세무사 검수 계산기 기준).</div>
+  </section>
+
+  <section class="two even">
+    <div class="card pad">
+      <h2 style="font-size:17px;margin-bottom:6px">화곡동 평당 시세 Top 10</h2>
+      <div id="rankChart"></div>
+      <div class="src">대표 평형 리치고 시세의 평당가(2026.11). 실거래가가 아닌 추정 시세.</div>
+    </div>
+    <div class="card pad">
+      <h2 style="font-size:17px;margin-bottom:6px">동별 최근 거래 · 로열동</h2>
+      <div class="tbl"><table id="dongTbl"></table></div>
+      <div class="src">로열동 104·101·109·105·102동, 선호층 12~18층(리치고 산출). 동 정보는 등기 전 추정 포함.</div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div><b>자료</b>: 국토교통부 아파트 매매·전월세 실거래가(공공데이터포털, 2024.11~2026.11 신고분 매매 252건·임대 631건) · 리치고 단지 페이지(시세·예측·호재·학군·라이벌, 2026.11.16 기준) · GO부동산 홈페이지 등록 매물 · <a href="https://kbthink.com/realestate/basics/10-15-measures.html" target="_blank" rel="noopener">10·15 대책 정리(KB Think)</a> · <a href="https://news.mtn.co.kr/news-detail/2025101507523614845" target="_blank" rel="noopener">주담대 한도 보도(MTN)</a></div>
+    <div>예측·전망은 모델 추정이며 실제 가격을 보장하지 않습니다(추측입니다). 세금·대출은 개인 조건에 따라 달라지므로 세무사·금융기관 확인이 필요합니다. 본 자료는 투자 권유가 아닙니다.</div>
+    <div><b>GO부동산 공인중개사사무소</b> · 대표 공인중개사 고옥선 · Tel. 010-2733-5040 · 02-6959-5040 · 강서힐스테이트 상가동 1층 132호</div>
+  </footer>
+</main>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+const RAW_T=`241102,a,1080,13,;241104,a,1000,1,;241105,b,1280,7,;241105,b,1360,5,;241126,e,1595,6,;241214,a,1090,12,;241226,a,1079,19,;250104,a,1095,13,;250111,a,1060,11,;250113,a,1090,12,;250118,a,1080,11,;250121,b,1310,15,;250204,b,1300,10,;250207,a,1085,5,;250207,d,1590,16,;250209,d,1480,14,;250210,a,1095,7,;250215,a,1085,16,;250220,a,1120,11,;250222,d,1530,8,;250224,b,1340,2,;250227,b,1305,11,;250301,b,1335,13,;250304,d,1480,8,;250305,b,1335,13,x;250307,b,1350,9,;250308,a,1150,15,;250308,a,1150,15,x;250308,a,1150,15,x;250308,b,1350,9,x;250308,b,1370,14,;250309,b,1350,15,;250310,a,1080,4,;250310,b,1340,18,;250310,d,1405,4,;250314,d,1480,17,;250316,a,1080,4,;250318,a,1180,8,;250319,a,1115,6,;250319,a,1150,19,;250322,a,1070,1,;250323,a,1170,10,;250324,b,1360,11,;250324,e,1625,16,;250329,b,1335,13,;250407,d,1450,12,;250414,d,1520,6,;250415,d,1385,1,;250416,b,1450,14,;250418,a,1070,15,;250419,a,1094,7,;250428,b,1306,7,;250501,b,1350,6,;250507,a,1090,5,;250510,a,1125,2,;250515,b,1345,10,;250517,a,1120,14,;250517,d,1430,8,;250518,b,1340,14,;250520,d,1570,13,;250524,a,1155,6,;250602,b,1370,7,;250602,b,970,13,;250603,b,1345,11,;250603,d,1570,19,;250607,a,1145,4,;250614,b,1345,19,;250616,a,1130,9,;250616,b,1410,8,;250620,a,1150,15,;250620,b,1360,8,x;250621,b,1415,14,;250622,a,1135,7,;250622,b,1400,16,;250623,e,1620,13,;250625,b,1445,18,;250626,e,1675,9,;250628,a,1140,7,;250630,a,1170,11,;250705,a,1180,4,;250709,a,1180,4,x;250715,d,1530,7,;250725,b,1460,7,;250809,b,1400,18,;250811,d,1510,10,;250813,b,1350,17,;250814,b,1310,3,;250820,d,1550,8,;250822,a,1160,15,;250823,b,1380,16,;250824,b,1340,2,;250830,a,1180,7,;250906,b,1400,12,;250906,c,1630,6,;250908,b,1360,8,;250912,a,1200,6,;250912,b,1360,17,;250912,b,1400,6,;250914,d,1570,2,;250915,b,1415,7,;250915,d,1570,18,;250916,b,1420,15,;250918,b,1300,9,;250918,d,1620,11,;250919,a,1200,10,;250920,a,1225,8,;250920,d,1620,17,;250922,b,1305,10,;250922,b,1500,10,;250924,d,1620,15,x;250924,d,1620,16,;250925,d,1620,15,;250926,a,1200,6,;250926,b,1405,10,;250926,d,1590,9,;250927,a,1155,2,;250929,a,1160,4,;250929,b,1370,9,;250929,b,1490,17,;250929,d,1600,20,;250930,b,1315,2,;250930,d,1450,6,;250930,d,1650,10,;251002,b,1360,3,;251003,d,1645,9,;251010,b,1427,15,;251010,b,1430,6,;251010,d,1645,5,;251011,a,1230,3,;251011,b,1350,4,;251011,d,1595,11,;251011,d,1635,10,;251013,b,1370,3,;251013,b,1430,13,;251014,d,1450,4,;251014,d,1495,16,;251015,a,1300,11,;251015,b,1275,1,;251015,b,1345,20,;251015,b,1450,13,;251019,b,1400,16,;251105,b,1380,11,;251107,b,1490,19,;251113,c,1550,8,;251128,d,1640,11,;251205,a,1320,11,;251209,d,1507,3,;251213,d,1500,14,;251215,b,1400,5,;251216,a,1315,15,;251217,b,1400,4,;260107,d,1650,15,;260108,a,1245,1,;260109,b,1335,1,;260109,b,1450,3,;260110,d,1515,2,;260112,a,1390,13,;260113,b,1410,13,;260116,b,1450,5,;260117,d,1455,2,;260117,e,1735,9,;260123,d,1610,4,;260129,a,1400,14,;260129,d,1650,11,;260130,d,1530,4,;260130,d,1530,4,x;260131,a,1325,14,;260205,b,1500,8,;260209,b,1415,2,;260211,b,1480,4,;260213,a,1400,15,;260219,b,1470,12,;260302,d,1750,11,;260305,d,1565,8,;260306,a,1420,10,;260306,e,1700,13,;260309,a,1350,7,;260314,d,1680,15,;260317,d,1665,5,;260320,b,1630,12,;260331,d,1700,14,;260401,b,1490,2,;260403,a,1300,5,;260403,b,1450,3,;260406,a,1175,15,d;260408,a,1350,6,;260411,b,1495,17,;260417,b,1510,7,;260420,d,1500,3,;260423,b,1390,11,dx;260424,b,1390,11,dx;260429,a,1350,9,;260501,b,1630,12,;260504,a,1370,7,;260505,b,1480,4,;260509,a,1320,4,;260514,a,1348,17,;260516,b,1470,3,;260516,d,1400,6,d;260518,b,1575,15,;260519,d,1600,16,;260520,d,1650,14,;260521,d,1665,11,;260523,a,1425,11,;260525,d,1700,16,;260526,d,1650,19,;260526,d,1680,3,;260528,b,1530,14,;260530,a,1400,8,;260602,b,1390,11,d;260603,a,1400,11,;260603,d,1400,12,d;260604,c,1755,6,;260604,c,1755,6,x;260610,b,1600,11,;260612,d,1695,17,;260615,c,1710,12,;260623,a,1350,4,;260627,d,1680,4,;260706,a,1410,4,;260708,e,1750,4,;260716,a,1380,6,;260718,a,1420,9,;260718,b,1530,4,;260720,d,1710,6,;260724,e,1750,4,;260727,d,1620,5,;260728,e,1745,4,;260729,c,1700,3,;260731,b,1565,3,;260812,d,1785,12,;260812,e,1740,2,;260819,d,1735,12,;260820,e,1750,4,;260821,a,1430,2,;260828,b,1550,4,;260902,d,1650,13,;261002,d,1795,5,;261007,a,1150,16,d;261013,a,1430,14,;261014,b,1550,4,x;261015,d,1800,15,;261016,b,1695,10,;261020,b,1650,4,;261021,a,1440,9,;261021,b,1200,9,d;261021,e,1850,13,;261027,d,1750,10,;261028,d,1800,19,;261030,b,1150,12,d;261030,b,1550,4,;261030,b,1643,18,`;
+const RAW_R=`2411a,6,601,1,5,90,186;2411b,3,719,2,6,313,147;2411c,1,870,0,0,0,0;2411d,4,973,2,0,0,0;2412a,9,536,4,2,385,62;2412b,6,715,3,13,458,102;2412c,0,0,0,1,300,200;2412d,6,936,1,3,300,255;2412e,1,1050,0,0,0,0;2501a,9,597,4,4,225,121;2501b,8,692,3,5,346,142;2501d,3,875,3,2,400,200;2502a,7,518,5,6,208,127;2502b,8,719,4,11,218,183;2502d,4,940,1,1,520,159;2502e,1,890,1,0,0,0;2503a,5,620,1,1,100,200;2503b,9,696,5,5,263,175;2503d,3,833,2,0,0,0;2504a,2,588,1,3,140,136;2504b,5,720,2,4,308,139;2504c,0,0,0,1,550,160;2504d,4,904,3,0,0,0;2504e,2,1075,1,0,0,0;2505a,4,596,2,2,165,157;2505b,6,733,2,5,352,144;2505c,1,756,1,3,267,160;2505d,2,870,0,4,400,204;2506a,7,651,1,3,167,135;2506b,5,702,4,2,150,220;2506d,4,943,2,1,670,100;2507a,9,575,5,0,0,0;2507b,7,673,5,11,370,118;2507c,2,851,2,0,0,0;2507d,3,838,2,0,0,0;2508a,6,627,3,4,218,150;2508b,6,742,1,3,300,139;2508d,2,890,0,0,0,0;2509a,2,605,1,1,150,160;2509b,5,782,1,7,289,162;2509d,3,843,2,4,444,183;2509e,2,1200,0,1,400,280;2510a,2,630,1,3,183,158;2510b,13,781,5,4,485,113;2510d,6,937,3,2,601,95;2510e,2,1155,0,0,0,0;2511a,7,615,5,5,186,168;2511b,11,744,6,7,236,199;2511d,4,948,2,0,0,0;2511e,0,0,0,1,550,150;2512a,5,641,2,8,291,117;2512b,5,729,2,7,236,167;2512d,4,965,2,0,0,0;2601a,8,645,3,2,300,133;2601b,3,757,2,5,244,182;2601d,2,1035,0,1,450,80;2601e,1,1080,0,0,0,0;2602a,9,616,6,1,600,40;2602b,3,777,0,5,222,194;2602d,7,978,4,2,650,113;2603a,2,639,1,4,225,179;2603b,6,811,2,5,280,184;2603d,1,1020,1,1,100,345;2604a,4,619,3,1,400,150;2604b,5,780,4,3,330,180;2604d,3,855,2,3,367,230;2604e,1,1200,0,1,901,75;2605a,9,682,3,4,425,89;2605b,1,756,1,6,375,166;2605d,1,1040,0,0,0,0;2606a,2,648,1,4,195,185;2606b,4,781,3,7,329,201;2606e,1,1200,0,0,0,0;2607a,0,0,0,4,325,122;2607b,5,766,4,8,510,122;2607d,2,975,2,3,867,71;2607e,1,1200,1,0,0,0;2608a,5,638,5,4,263,193;2608b,13,806,10,3,430,158;2608d,4,1090,2,0,0,0;2609a,1,840,0,3,292,168;2609b,5,792,3,1,150,280;2609d,1,1100,0,2,575,162;2610a,5,712,2,6,150,227;2610b,6,822,4,5,366,197;2610d,5,1101,3,1,600,200;2611a,1,750,1,0,0,0;2611b,3,760,3,2,176,228;2611d,1,1130,0,1,400,300`;
+const HS=[["10792","매매","아파트","매12억2,000만","59.99","","강서힐스테이트 24평 정남향,확장,정원뷰,입주가능"],["10772","매매","아파트","매14억","84.99","111동","우장산역세권 3분,갭투자6억,남서향,에어컨6대,입주가능"],["10765","월세","빌딩·상가","보2,000만월140만관230,000원","22.15","","강서힐스테이트 단지내 상가 임대 약 7평"],["10866","월세","아파트","보5억월80만관250,000원","59.99","","강서힐스테이트 24평 월세 5억/ 80만원"],["10933","매매","아파트","매15억2,000만","84.99","114동","강서힐스테이트 33평 매매 15.2억"],["10801","매매","아파트","매17억","84.99","118동","강서힐스테이트 34평"],["10802","매매","아파트","매17억","84.99","","강서힐스테이트 34평"],["10804","매매","아파트","매13억5,000만","84.99","","강서힐스테이트 34평"],["10805","매매","아파트","매15억5,000만","128.81","","강서힐스테이트 49평"],["10806","매매","아파트","매13억8,000만","84.99","","강서힐스테이트 34평"],["10815","매매","아파트","매13억","59.99","","강서힐스테이트 25평 매매"],["10816","월세","아파트","보5억월100만관180,000원","59.99","","강서힐스테이트 25평 월세"],["10819","매매","아파트","매14억5,000만","84.99","","강서힐스테이트 25평"],["10832","전세","아파트","전7억관180,000원","59.99","","강서힐스테이트 25평 전세"],["10843","월세","아파트","보2억월180만관250,000원","59.99","","강서힐스테이트 24평 월세 2억/ 180만원 109동 중층"],["10837","매매","아파트","매13억4,000만","59.99","","강서힐스테이트 25평 매매"],["10900","월세","빌딩·상가","권8,000만보1억2,000만월360만","35.89","","강서힐스테이트 1층 상가 임대"],["10902","매매","아파트","매16억","84.99","","강서힐스테이트 33평 매매"],["10947","매매","아파트","매16억7,000만","84.99","","강서힐스테이트 33평 매매 16.2억"],["10943","매매","아파트","매16억","84.99","","강서힐스테이트 34평 매매 16억"],["10871","매매","아파트","매14억2,000만","59.99","","강서힐스테이트 24평 14억2천 매매"],["10867","전세","아파트","전7억관250,000원","59.99","","강서힐스테이트 24평 전세 7억"],["10941","매매","아파트","매16억","84.99","","강서힐스테이트 34평 , 16억 매매 ,남향따듯,확장형 ,집구경환영"],["10940","매매","아파트","매16억3,000만","84.99","","강서힐스테이트34평 ,최근수리,에어컨4,집구경환영"],["10938","월세","빌딩·상가","보1억월650만","117.97","","강서힐스테이트 상가 임대"],["10937","월세","빌딩·상가","보5,000만월350만","117.97","","강서힐스테이트 상가 임대"],["10923","매매","아파트","매16억9,000만","119.63","","강서힐스테이트 45평 매매"],["10917","매매","아파트","매16억5,000만","128.81","","강서힐스테이트 48평 매매"],["10894","전세","아파트","전11억3,000만관350,000원","128.81","","강서힐스테이트 48평 전세"],["10893","매매","아파트","매19억5,000만","128.81","","강서힐스테이트 48평 매매"],["10987","월세","아파트","보10억월120만관450,000원","152.1","106동","강서힐스테이트 55평 월세 10억/120"],["10986","전세","아파트","전13억관450,000원","152.1","106동","강서힐스테이트 55평 전세 13억"],["10985","매매","아파트","매19억","152.1","106동","강서힐스테이트 55평 매매 19억"],["10984","매매","아파트","매14억","59.99","109동","강서힐스테이트 24평 매매 14억"],["10970","월세","빌딩·상가","보3,000만월350만관1,000,000원","120.38","","강서힐스테이트 상가 3층 임대"]];
+</script>
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const el=(t,a={},...c)=>{const e=document.createElement(t);for(const k in a){if(k==='class')e.className=a[k];else if(k==='text')e.textContent=a[k];else e.setAttribute(k,a[k])}c.forEach(x=>x!=null&&x!==''&&e.append(x));return e};
+const sv=(t,a={})=>{const e=document.createElementNS('http://www.w3.org/2000/svg',t);for(const k in a)e.setAttribute(k,a[k]);return e};
+const fmt=n=>Math.round(n).toLocaleString('ko-KR');
+const won=m=>{m=Math.round(m);const e=Math.floor(m/10000),r=m%10000;return e?(e+'억'+(r?' '+r.toLocaleString('ko-KR'):'')):r.toLocaleString('ko-KR')+'만'};
+const eok=m=>(m/10000).toFixed(2).replace(/\.?0+$/,'')+'억';
+const tip=$('#tip');
+const showTip=(ev,lines)=>{tip.hidden=false;tip.replaceChildren(...lines.map((l,i)=>{const d=el('div',{text:l});if(!i)d.style.fontWeight='700';return d}));tip.style.left=Math.min(ev.clientX+12,innerWidth-270)+'px';tip.style.top=Math.max(8,ev.clientY-12-tip.offsetHeight)+'px'};
+const hideTip=()=>{tip.hidden=true};
+$('#copyTel').onclick=async()=>{try{await navigator.clipboard.writeText('010-2733-5040');$('#copyTel').textContent='복사됨'}catch(e){const r=document.createRange();r.selectNodeContents($('#tel'));const s=getSelection();s.removeAllRanges();s.addRange(r);$('#copyTel').textContent='번호를 선택했어요'}};
+
+/* ---------- data ---------- */
+const PY={a:{n:'24평형',ar:'59.99',col:'--c-a'},b:{n:'33평형',ar:'84.99',col:'--c-b'},c:{n:'45평형',ar:'119.63',col:'--c-c'},d:{n:'48평형',ar:'128.81',col:'--c-d'},e:{n:'55평형',ar:'152.1',col:'--c-e'}};
+const RICH={a:[141475,72277],b:[158662,84961],c:[170955,102350],d:[175443,107866],e:[183061,116981]};
+const T=RAW_T.trim().split(';').filter(Boolean).map(s=>{const [d,k,p,f,fl]=s.split(',');return {d,k,p:+p*100,f:+f,dir:fl.includes('d'),off:fl.includes('x'),y:2000+ +d.slice(0,2),m:+d.slice(2,4),day:+d.slice(4,6)}});
+const R={};RAW_R.trim().split(';').forEach(s=>{const [key,jc,ja,jr,wc,wa,wr]=s.split(',').map((v,i)=>i?+v:v);R[key]={jc,ja:ja*100,jr,wc,wa:wa*100,wr}});
+const MONTHS=[];for(let i=0;i<25;i++){const d=new Date(Date.UTC(2024,10+i,1));MONTHS.push([d.getUTCFullYear(),d.getUTCMonth()+1])}
+const mi=(y,m)=>(y-2024)*12+m-11;
+const ym=(y,m)=>String(y).slice(2)+String(m).padStart(2,'0');
+const median=a=>{if(!a.length)return 0;const s=a.slice().sort((x,y)=>x-y),h=s.length>>1;return s.length%2?s[h]:(s[h-1]+s[h])/2};
+const valid=T.filter(t=>!t.off);
+const monthMed=k=>MONTHS.map(([y,m])=>median(valid.filter(t=>t.k===k&&t.y===y&&t.m===m&&!t.dir).map(t=>t.p)));
+const fmtD=t=>`20${t.d.slice(0,2)}.${t.d.slice(2,4)}.${t.d.slice(4,6)}`;
+
+/* ---------- 평형 table ---------- */
+const HSL=HS.map(([id,type,cat,price,area,dong,title])=>{const k=cat==='아파트'?(Object.keys(PY).find(k=>PY[k].ar===area)||''):'s';
+  const toMan=s=>{const m=s.match(/(\d+)억(?:([\d,]+)만)?|([\d,]+)만/);if(!m)return 0;return m[1]?(+m[1]*10000+(m[2]?+m[2].replace(/,/g,''):0)):+m[3].replace(/,/g,'')};
+  const sm=type==='매매'?toMan(price.replace(/^매/,'')):type==='전세'?toMan(price.replace(/^전/,'')):toMan((price.match(/보([\d억,만]+)/)||[])[1]||'');
+  const flags=[];const tm=title.replace(/갭투자\s*[\d.]+억/g,'').match(/(\d+(?:\.\d+)?)억/);if(type==='매매'&&tm&&Math.abs(+tm[1]*10000-sm)>=1000)flags.push(`제목(${tm[1]}억)과 등록가 다름`);
+  const tp=title.match(/(\d{2})평/);if(k&&k!=='s'&&tp&&Math.abs(+tp[1]-parseInt(PY[k].n))>3)flags.push(`제목 ${tp[1]}평 · 전용 ${area}㎡ 기준 ${PY[k].n}`);
+  return {id,type,cat,price:price.replace(/관[\d,]+원$/,'').replace(/^(매|전)/,''),area,dong,title,k,sm,flags}});
+Object.keys(PY).forEach(k=>{const v=HSL.filter(x=>x.k===k&&x.type==='매매').map(x=>x.sm).sort((a,b)=>a-b);if(v.length<3)return;const med=v[v.length>>1];HSL.filter(x=>x.k===k&&x.type==='매매'&&x.sm<=med*0.88).forEach(x=>x.flags.push('같은 평형 호가 중앙값보다 12% 이상 낮음 · 거래가능 여부 확인'))});
+(function(){
+  const t=$('#pyTbl');const mx=Math.max(...Object.values(RICH).map(r=>r[0]));
+  t.append(el('thead',{},el('tr',{},...['평형 (전용)','매매 시세','전세 시세','전세가율','최근 실거래 (국토부)','1년 거래','GO 보유 매물'].map((h,i)=>el('th',{class:i?'':'l',text:h})))));
+  const tb=el('tbody');
+  Object.entries(PY).forEach(([k,p])=>{const [s,j]=RICH[k];const last=valid.filter(x=>x.k===k).at(-1);const yr=valid.filter(x=>x.k===k&&+x.d>=251117).length;const go=HSL.filter(x=>x.k===k);
+    tb.append(el('tr',{},el('td',{},el('span',{class:'sw',style:`background:var(${p.col})`}),el('b',{text:p.n}),el('span',{class:'src',text:` ${p.ar}㎡`})),
+      el('td',{class:'num'},el('div',{class:'barcell'},el('span',{class:'minibar',style:`width:${Math.round(s/mx*90)}px`}),el('b',{text:won(s)}))),
+      el('td',{class:'num'},el('div',{class:'barcell'},el('span',{class:'minibar j',style:`width:${Math.round(j/mx*90)}px`}),won(j))),
+      el('td',{class:'num',text:Math.round(j/s*100)+'%'}),
+      el('td',{class:'num',text:last?`${won(last.p)} · ${fmtD(last)} · ${last.f}층${last.dir?' (직거래)':''}`:'-'}),
+      el('td',{class:'num',text:yr+'건'}),
+      el('td',{class:'num',text:go.length?`${go.length}건 (매${go.filter(x=>x.type==='매매').length})`:'-'})))});
+  t.append(tb);
+})();
+
+/* ---------- trade chart ---------- */
+let K='b';
+const tabs=$('#tTabs');Object.entries(PY).forEach(([k,p])=>{const b=el('button',{type:'button',role:'tab','aria-selected':String(k===K),text:p.n});b.onclick=()=>{K=k;drawT();drawRecent();drawJ()};tabs.append(b)});
+function drawT(){
+  $$('#tTabs button').forEach((b,i)=>b.setAttribute('aria-selected',String(Object.keys(PY)[i]===K)));
+  const box=$('#tChart');const W=Math.max(320,box.clientWidth||600),H=260,L=46,Rr=12,Tt=12,B=26;
+  const pts=valid.filter(t=>t.k===K);const meds=monthMed(K);
+  const vals=pts.map(t=>t.p);const lo=Math.floor((Math.min(...vals)-3000)/10000*2)/2*10000,hi=Math.ceil((Math.max(...vals)+3000)/10000*2)/2*10000;
+  const x=(i,day=15)=>L+(W-L-Rr)*((i+(day-1)/30)/25),y=v=>Tt+(H-Tt-B)*(1-(v-lo)/(hi-lo));
+  const s=sv('svg',{viewBox:`0 0 ${W} ${H}`,width:'100%',role:'img','aria-label':PY[K].n+' 실거래 추이'});
+  const g=sv('g',{class:'grid'});const st=(hi-lo)>80000?20000:10000;for(let v=Math.ceil(lo/st)*st;v<=hi;v+=st){g.append(sv('line',{x1:L,x2:W-Rr,y1:y(v),y2:y(v)}));const t=sv('text',{x:L-6,y:y(v)+4,'text-anchor':'end'});t.textContent=eok(v);g.append(t)}s.append(g);
+  MONTHS.forEach(([yy,mm],i)=>{if(i%3)return;const t=sv('text',{x:x(i,1),y:H-8});t.textContent=`${String(yy).slice(2)}.${mm}`;s.append(t)});
+  const col=`var(${PY[K].col})`;
+  const line=meds.map((v,i)=>v?`${x(i).toFixed(1)},${y(v).toFixed(1)}`:null).filter(Boolean);
+  if(line.length>1)s.append(sv('polyline',{points:line.join(' '),fill:'none',stroke:col,'stroke-width':2.2,opacity:.85}));
+  pts.forEach(t=>{const c=sv('circle',{cx:x(mi(t.y,t.m),t.day),cy:y(t.p),r:4,fill:t.dir?'var(--panel)':col,stroke:col,'stroke-width':1.5,opacity:.85});c.addEventListener('mousemove',ev=>showTip(ev,[`${won(t.p)}`,`${fmtD(t)} · ${t.f}층${t.dir?' · 직거래':''}`]));c.addEventListener('mouseleave',hideTip);s.append(c)});
+  const lastMed=meds.filter(Boolean).at(-1);if(lastMed){const i=meds.lastIndexOf(lastMed);const tt=sv('text',{x:x(i)-8,y:y(lastMed)+18,'text-anchor':'end'});tt.textContent='중앙값 '+eok(lastMed);tt.style.fill=col;tt.style.fontWeight='700';s.append(tt)}
+  box.replaceChildren(s);
+}
+function drawRecent(){
+  const L=T.filter(t=>t.k===K).slice(-10).reverse();$('#recentLbl').textContent=PY[K].n+' 최근 10건';
+  const t=$('#recentTbl');t.replaceChildren(el('thead',{},el('tr',{},...['계약일','거래가','층','비고'].map((h,i)=>el('th',{class:i?'':'l',text:h})))));
+  const tb=el('tbody');L.forEach(r=>tb.append(el('tr',{class:r.off?'off':''},el('td',{class:'num',text:fmtD(r)}),el('td',{class:'num'},el('b',{text:won(r.p)})),el('td',{class:'num',text:r.f+'층'}),el('td',{},r.off?el('span',{class:'pill',text:'해제'}):r.dir?el('span',{class:'pill u',text:'직거래'}):el('span',{class:'pill g',text:'중개'})))));t.append(tb);
+}
+/* ---------- jeonse chart ---------- */
+function drawJ(){
+  const box=$('#jChart');const W=Math.max(320,box.clientWidth||500),H=230,L=46,Rr=40,Tt=12,B=26;
+  const j=MONTHS.map(([y,m])=>{const r=R[ym(y,m)+K];return r&&r.jc?r.ja:0});const meds=monthMed(K);
+  let lastM=0;const ratio=MONTHS.map((_,i)=>{if(meds[i])lastM=meds[i];return j[i]&&lastM?j[i]/lastM*100:0});
+  $('#jLbl').textContent=PY[K].n;
+  const all=[...j,...meds].filter(Boolean);const lo=Math.floor(Math.min(...all)/10000)*10000,hi=Math.ceil(Math.max(...all)/10000)*10000;
+  const x=i=>L+(W-L-Rr)*i/24,y=v=>Tt+(H-Tt-B)*(1-(v-lo)/(hi-lo)),y2=v=>Tt+(H-Tt-B)*(1-(v-30)/(80-30));
+  const s=sv('svg',{viewBox:`0 0 ${W} ${H}`,width:'100%',role:'img','aria-label':'전세 흐름'});
+  const g=sv('g',{class:'grid'});for(let v=lo;v<=hi;v+=(hi-lo>60000?20000:10000)){g.append(sv('line',{x1:L,x2:W-Rr,y1:y(v),y2:y(v)}));const t=sv('text',{x:L-6,y:y(v)+4,'text-anchor':'end'});t.textContent=eok(v);g.append(t)}s.append(g);
+  [40,50,60,70].forEach(v=>{const t=sv('text',{x:W-Rr+6,y:y2(v)+4});t.textContent=v+'%';t.style.fill='var(--amber)';s.append(t)});
+  MONTHS.forEach(([yy,mm],i)=>{if(i%4)return;const t=sv('text',{x:x(i),y:H-8,'text-anchor':'middle'});t.textContent=`${String(yy).slice(2)}.${mm}`;s.append(t)});
+  const pl=(arr,f,c,w,dash)=>{const p=arr.map((v,i)=>v?`${x(i).toFixed(1)},${f(v).toFixed(1)}`:null).filter(Boolean);if(p.length>1)s.append(sv('polyline',{points:p.join(' '),fill:'none',stroke:c,'stroke-width':w,'stroke-dasharray':dash||''}))};
+  pl(meds,y,'var(--red)',2);pl(j,y,'var(--blue)',2.2);pl(ratio,y2,'var(--amber)',1.6,'4 3');
+  j.forEach((v,i)=>{if(!v)return;const c=sv('circle',{cx:x(i),cy:y(v),r:3,fill:'var(--blue)'});const [yy,mm]=MONTHS[i];const r=R[ym(yy,mm)+K];c.addEventListener('mousemove',ev=>showTip(ev,[`${yy}년 ${mm}월`,`전세 평균 ${won(v)} (${r.jc}건, 갱신 ${r.jr}건)`,meds[i]?`매매 중앙값 ${won(meds[i])}`:'매매 없음',ratio[i]?`전세가율 ${ratio[i].toFixed(1)}%`:''].filter(Boolean)));c.addEventListener('mouseleave',hideTip);s.append(c)});
+  box.replaceChildren(s);
+}
+/* ---------- rival ---------- */
+(function(){
+  const H6=['24상','24하','25상','25하','26상','26하'],A=[127000,130000,134750,140000,148750,156500],B=[119500,124000,128250,140500,153000,160250];
+  const box=$('#rvChart');const W=Math.max(320,box.clientWidth||500),H=220,L=46,Rr=60,Tt=14,B2=26;const lo=110000,hi=165000;
+  const x=i=>L+(W-L-Rr)*i/5,y=v=>Tt+(H-Tt-B2)*(1-(v-lo)/(hi-lo));
+  const s=sv('svg',{viewBox:`0 0 ${W} ${H}`,width:'100%',role:'img','aria-label':'라이벌 반기 중간값'});
+  const g=sv('g',{class:'grid'});for(let v=lo;v<=hi;v+=10000){g.append(sv('line',{x1:L,x2:W-Rr,y1:y(v),y2:y(v)}));const t=sv('text',{x:L-6,y:y(v)+4,'text-anchor':'end'});t.textContent=eok(v);g.append(t)}s.append(g);
+  H6.forEach((h,i)=>{const t=sv('text',{x:x(i),y:H-8,'text-anchor':'middle'});t.textContent=h;s.append(t)});
+  [[A,'var(--red)','강힐'],[B,'var(--ink)','우장산IPe']].forEach(([arr,c,n])=>{s.append(sv('polyline',{points:arr.map((v,i)=>`${x(i)},${y(v)}`).join(' '),fill:'none',stroke:c,'stroke-width':2.4}));arr.forEach((v,i)=>{const ci=sv('circle',{cx:x(i),cy:y(v),r:3.5,fill:c});ci.addEventListener('mousemove',ev=>showTip(ev,[`20${H6[i]}반기`,`강서힐스테이트 ${won(A[i])}`,`우장산아이파크e편한세상 ${won(B[i])}`]));ci.addEventListener('mouseleave',hideTip);s.append(ci)});const t=sv('text',{x:x(5)+8,y:y(arr[5])+(n==='강힐'?12:-4)});t.textContent=eok(arr[5]);t.style.fill=c;t.style.fontWeight='700';s.append(t)});
+  box.replaceChildren(s);
+})();
+/* ---------- listings ---------- */
+let HP='b';
+const HSN=Object.assign({},...Object.entries(PY).map(([k,p])=>({[k]:p.n})),{s:'단지 내 상가'});
+function drawHS(){
+  const sum=$('#hsSum');sum.replaceChildren();
+  ['all','a','b','c','d','e','s'].forEach(k=>{const L=k==='all'?HSL:HSL.filter(x=>x.k===k);if(!L.length)return;const sell=L.filter(x=>x.type==='매매').map(x=>x.sm);
+    const c={매매:0,전세:0,월세:0};L.forEach(x=>c[x.type]++);
+    const rg=k==='all'?'전체 보기':sell.length?(sell.length>1?`매매 ${eok(Math.min(...sell))}~${eok(Math.max(...sell))}`:`매매 ${eok(sell[0])}`):'임대만';
+    const b=el('button',{type:'button',class:'hs-tile','aria-pressed':String(HP===k)},el('span',{class:'py',text:k==='all'?'전체':HSN[k]}),el('span',{class:'cnt num',text:`${L.length}건 · 매${c.매매} 전${c.전세} 월${c.월세}`}),el('span',{class:'rg num',text:rg}));
+    b.onclick=()=>{HP=k;drawHS()};sum.append(b)});
+  const ord={매매:0,전세:1,월세:2},ko=['a','b','c','d','e','s'];
+  const L=HSL.filter(x=>HP==='all'||x.k===HP).sort((a,b)=>ko.indexOf(a.k)-ko.indexOf(b.k)||ord[a.type]-ord[b.type]||a.sm-b.sm);
+  const t=$('#hsTbl');t.replaceChildren(el('thead',{},el('tr',{},...['매물번호','평형','유형','가격','전용','동','매물 설명'].map((h,i)=>el('th',{class:i&&i<6&&i!==1&&i!==2&&i!==5?'':'l',text:h})))));
+  const tb=el('tbody');L.forEach(x=>{const td=el('td',{class:'t'},x.title);x.flags.forEach(f=>td.append(el('span',{class:'warn-t',text:'⚠ '+f})));
+    tb.append(el('tr',{},el('td',{},el('a',{href:`https://gogogogo.kr/item/view/${x.id}`,target:'_blank',rel:'noopener',text:x.id})),el('td',{class:'l',text:HSN[x.k]||'-'}),el('td',{class:'l'},el('span',{class:'pill '+({매매:'t',전세:'j',월세:'w'}[x.type]),text:x.type})),el('td',{class:'num'},el('b',{text:x.price})),el('td',{class:'num',text:x.area+'㎡'}),el('td',{class:'l',text:x.dong||'-'}),td))});
+  t.append(tb);
+}
+/* ---------- schools ---------- */
+[['A','명덕여자중학교','서울 상위 48%','0.8km'],['S','명덕고등학교','상위 24% · 서울대 11명','0.8km'],['B','화곡중학교','서울 상위 62%','0.6km'],['B','화곡고등학교','서울 상위 74%','0.7km'],['C','서울우장초등학교','서울 상위 81% · 도보 13분','0.7km']].forEach(([g,n,d,r])=>$('#schools').append(el('li',{},el('span',{},el('span',{class:'grade '+g,text:g}),n,el('div',{class:'src',text:d})),el('span',{class:'r',text:r}))));
+/* ---------- loan table ---------- */
+(function(){
+  const t=$('#loanTbl');t.append(el('thead',{},el('tr',{},...['평형','매매 시세','LTV 40%','가격별 한도','최대 주담대','필요 자기자금'].map((h,i)=>el('th',{class:i?'':'l',text:h})))));
+  const tb=el('tbody');Object.entries(PY).forEach(([k,p])=>{const s=RICH[k][0];const ltv=s*0.4;const cap=s<=150000?60000:s<=250000?40000:20000;const loan=Math.min(ltv,cap);
+    tb.append(el('tr',{},el('td',{},el('span',{class:'sw',style:`background:var(${p.col})`}),p.n),el('td',{class:'num',text:won(s)}),el('td',{class:'num',text:won(ltv)}),el('td',{class:'num',text:s<=150000?'15억 이하 · 6억':'15억 초과 · 4억'}),el('td',{class:'num'},el('b',{text:won(loan)})),el('td',{class:'num'},el('b',{class:'up',text:won(s-loan)}))))});
+  t.append(tb);
+})();
+/* ---------- cost calculator ---------- */
+function calc(){
+  const P=Math.max(0,+$('#cPrice').value||0),big=$('#cArea').value==='l',h=+$('#cHouse').value;
+  let r,edu,agr;
+  if(h===1){r=P<=60000?1:P<=90000?(P/10000*2/3-3):3;edu=r/10;agr=big?0.2:0}
+  else if(h===2){r=8;edu=0.4;agr=big?0.6:0}else{r=12;edu=0.4;agr=big?1.0:0}
+  const tax=P*(r+edu+agr)/100;
+  const rate=P<5000?0.6:P<20000?0.5:P<90000?0.4:P<120000?0.5:P<150000?0.6:0.7;
+  const fee=P*rate/100,cap=P<5000?25:P<20000?80:Infinity;const feeC=Math.min(fee,cap);
+  $('#calcRes').replaceChildren(
+    el('div',{},el('div',{class:'k',text:'취득세 합계'}),el('div',{class:'v num',text:won(tax)+'원'}),el('div',{class:'s',text:`취득세 ${r.toFixed(2).replace(/\.?0+$/,'')}% + 지방교육세 ${edu.toFixed(2).replace(/\.?0+$/,'')}%${agr?` + 농특세 ${agr}%`:''}${h>1?' · 조정대상지역 중과 기준':''}`})),
+    el('div',{},el('div',{class:'k',text:'중개보수 상한'}),el('div',{class:'v num',text:won(feeC)+'원'}),el('div',{class:'s',text:`상한요율 ${rate}% · 부가세 별도`})),
+    el('div',{},el('div',{class:'k',text:'GO부동산 반값중개 적용 시'}),el('div',{class:'v num',text:won(feeC/2)+'원'}),el('div',{class:'s',text:'홈페이지 안내 혜택 · 적용 조건은 상담으로 확인'})),
+    el('div',{},el('div',{class:'k',text:'취득세 + 중개보수(상한)'}),el('div',{class:'v num',text:won(tax+feeC)+'원'}),el('div',{class:'s',text:'법무사·채권·인지세 별도'})));
+}
+['cPrice','cArea','cHouse'].forEach(id=>$('#'+id).addEventListener('input',calc));$('#calcForm').addEventListener('submit',e=>e.preventDefault());
+/* ---------- ranking ---------- */
+(function(){
+  const D=[['우장산숲아이파크',5798],['우장산아이파크e편한세상',5051],['강서힐스테이트',4807],['우장산롯데캐슬',4142],['초록',3679],['강서금호어울림퍼스티어',3307],['우장산SK뷰',3276],['디아인스',3060],['우장산한화꿈에그린',3043],['우장산롯데',3021]];
+  const box=$('#rankChart');D.forEach(([n,v],i)=>{const me=n==='강서힐스테이트';box.append(el('div',{style:'display:grid;grid-template-columns:22px minmax(0,150px) minmax(0,1fr) 70px;gap:8px;align-items:center;padding:3px 0;font-size:13px'+(me?';font-weight:800':'')},el('span',{class:'num',text:i+1}),el('span',{style:'overflow:hidden;text-overflow:ellipsis;white-space:nowrap',text:n}),el('span',{style:`height:10px;border-radius:5px;background:${me?'var(--red)':'var(--line)'};width:${Math.round(v/5798*100)}%`}),el('span',{class:'num',style:'text-align:right',text:fmt(v)+'만'})))});
+})();
+/* ---------- dong table ---------- */
+(function(){
+  const D=[['101동','로열 · 19층 · 69세대','26.05 48평 16층 17억'],['102동','로열 · 21층 · 80세대','26.05 48평 16층 16억'],['103동','21층 · 79세대','26.06 48평 17층 16.95억'],['104동','로열 · 20층 · 70세대','26.06 48평 12층 14억'],['105동','로열 · 20층 · 64세대','26.06 24평 4층 13.5억'],['106동','남향 · 20층 · 36세대','25.06 55평 9층 16.75억'],['107동','남향 · 20층 · 70세대','26.07 45평 3층 17억'],['108동','20층 · 40세대','26.07 24평 4층 14.1억'],['109동','로열 · 남향 · 20층 · 78세대','26.08 24평 2층 14.3억'],['110동','남향 · 20층 · 40세대','26.01 24평 13층 13.9억']];
+  const t=$('#dongTbl');t.append(el('thead',{},el('tr',{},...['동','특징','최근 거래'].map(h=>el('th',{class:'l',text:h})))));const tb=el('tbody');D.forEach(r=>tb.append(el('tr',{},...r.map((c,i)=>el('td',{class:'l'},i===1&&c.includes('로열')?el('span',{class:'pill t',text:'로열'}):'',' ',i===1?c.replace(/로열(·남향)? · |로열 · /,'').replace('로열·','') :c)))));t.append(tb);
+})();
+
+function all(){drawT();drawRecent();drawJ();drawHS()}
+all();calc();
+let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{drawT();drawJ()},150)});
+})();
+</script>
+
+</body>
+</html>
