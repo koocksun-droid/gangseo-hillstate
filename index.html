@@ -443,8 +443,7 @@ function calc(){
   $('#calcRes').replaceChildren(
     el('div',{},el('div',{class:'k',text:'취득세 합계'}),el('div',{class:'v num',text:won(tax)+'원'}),el('div',{class:'s',text:`취득세 ${r.toFixed(2).replace(/\.?0+$/,'')}% + 지방교육세 ${edu.toFixed(2).replace(/\.?0+$/,'')}%${agr?` + 농특세 ${agr}%`:''}${h>1?' · 조정대상지역 중과 기준':''}`})),
     el('div',{},el('div',{class:'k',text:'중개보수 상한'}),el('div',{class:'v num',text:won(feeC)+'원'}),el('div',{class:'s',text:`상한요율 ${rate}% · 부가세 별도`})),
-    el('div',{},el('div',{class:'k',text:'GO부동산 반값중개 적용 시'}),el('div',{class:'v num',text:won(feeC/2)+'원'}),el('div',{class:'s',text:'홈페이지 안내 혜택 · 적용 조건은 상담으로 확인'})),
-    el('div',{},el('div',{class:'k',text:'취득세 + 중개보수(상한)'}),el('div',{class:'v num',text:won(tax+feeC)+'원'}),el('div',{class:'s',text:'법무사·채권·인지세 별도'})));
+    el('div',{style:'grid-column:1/-1'},el('div',{class:'k',text:'취득세 + 중개보수(상한)'}),el('div',{class:'v num',text:won(tax+feeC)+'원'}),el('div',{class:'s',text:'법무사·채권·인지세 별도'})));
 }
 ['cPrice','cArea','cHouse'].forEach(id=>$('#'+id).addEventListener('input',calc));$('#calcForm').addEventListener('submit',e=>e.preventDefault());
 /* ---------- ranking ---------- */
